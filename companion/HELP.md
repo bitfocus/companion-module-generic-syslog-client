@@ -1,3 +1,7 @@
-## Your module
+## Syslog Client
 
-Write some help for your users here!
+Send syslog messages according to RFC 3164 & RFC 5424
+
+### Actions
+
+Log Message

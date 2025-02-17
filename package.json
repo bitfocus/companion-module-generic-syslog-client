@@ -1,6 +1,6 @@
 {
-	"name": "your-module-name",
-	"version": "0.1.0",
+	"name": "generic-syslog-client",
+	"version": "1.0.0",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
@@ -16,21 +16,26 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/bitfocus/companion-module-your-module-name.git"
+		"url": "git+https://github.com/phillipivan/companion-module-generic-syslog-client.git"
 	},
 	"dependencies": {
-		"@companion-module/base": "~1.11.2"
+		"@companion-module/base": "~1.11.3",
+		"@phillipivan/syslog-client": "^1.2.0",
+		"p-queue": "^8.1.0"
 	},
 	"devDependencies": {
 		"@companion-module/tools": "^2.1.1",
-		"@types/node": "^22.10.2",
-		"eslint": "^9.17.0",
+		"@types/node": "^22.13.4",
+		"eslint": "^9.20.1",
 		"husky": "^9.1.7",
-		"lint-staged": "^15.2.11",
-		"prettier": "^3.4.2",
+		"lint-staged": "^15.4.3",
+		"prettier": "^3.5.1",
 		"rimraf": "^6.0.1",
-		"typescript": "~5.5.4",
-		"typescript-eslint": "^8.18.1"
+		"typescript": "~5.7.3",
+		"typescript-eslint": "^8.24.0"
+	},
+	"engines": {
+		"node": "^22.14"
 	},
 	"prettier": "@companion-module/tools/.prettierrc.json",
 	"lint-staged": {
@@ -41,5 +46,5 @@
 			"yarn lint:raw --fix"
 		]
 	},
-	"packageManager": "yarn@4.5.3"
+	"packageManager": "yarn@4.6.0"
 }
