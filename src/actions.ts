@@ -64,7 +64,7 @@ export function UpdateActions(self: SyslogClient): void {
 					id: 'appName',
 					label: 'Application Name',
 					default: self.config.appName,
-					tooltip: 'Value to place into the HOSTNAME part of the HEADER part of each message sent',
+					tooltip: 'Set the APP-NAME field when using RFC 5424',
 					useVariables: true,
 					isVisible: (options, isVisibleData) => {
 						console.log(options)
