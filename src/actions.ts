@@ -66,8 +66,7 @@ export function UpdateActions(self: SyslogClient): void {
 					default: self.config.appName,
 					tooltip: 'Set the APP-NAME field when using RFC 5424',
 					useVariables: true,
-					isVisible: (options, isVisibleData) => {
-						console.log(options)
+					isVisible: (_options, isVisibleData) => {
 						return isVisibleData.rfc5424
 					},
 					isVisibleData: { rfc5424: self.config.rfc5424 },
@@ -78,8 +77,7 @@ export function UpdateActions(self: SyslogClient): void {
 					label: 'Message ID',
 					default: '',
 					useVariables: true,
-					isVisible: (options, isVisibleData) => {
-						console.log(options)
+					isVisible: (_options, isVisibleData) => {
 						return isVisibleData.rfc5424
 					},
 					isVisibleData: { rfc5424: self.config.rfc5424 },
