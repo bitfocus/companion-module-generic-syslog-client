@@ -4,7 +4,7 @@ import { Facility, Severity, MessageOptions } from '@phillipivan/syslog-client'
 export function UpdateActions(self: SyslogClient): void {
 	self.setActionDefinitions({
 		logMessage: {
-			name: 'Log Message',
+			name: 'Send Syslog Message',
 			options: [
 				{
 					id: 'msg',

@@ -1,7 +1,7 @@
 import { Regex, type SomeCompanionConfigField } from '@companion-module/base'
 import os from 'node:os'
-
 import { Facility, Severity, Transport } from '@phillipivan/syslog-client'
+import { LoggerLevel } from './logger.js'
 
 export interface ModuleConfig {
 	host: string
@@ -12,6 +12,7 @@ export interface ModuleConfig {
 	facility: Facility
 	severity: Severity
 	appName: string
+	logging: LoggerLevel
 }
 
 export function GetConfigFields(): SomeCompanionConfigField[] {
@@ -119,6 +120,51 @@ export function GetConfigFields(): SomeCompanionConfigField[] {
 			tooltip: 'Set the APP-NAME field when using RFC 5424',
 			isVisible: (options) => {
 				return !!options.rfc5424
+			},
+		},
+		{
+			type: 'static-text',
+			id: 'placeholder1',
+			label: '',
+			value: '',
+			width: 4,
+			isVisible: (options) => {
+				return !options.rfc5424
+			},
+		},
+		{
+			type: 'dropdown',
+			id: 'logging',
+			label: 'Minimum Log Level',
+			default: LoggerLevel.Information,
+			choices: [
+				{ id: LoggerLevel.Error, label: 'Error' },
+				{ id: LoggerLevel.Warning, label: 'Warning' },
+				{ id: LoggerLevel.Information, label: 'Information' },
+				{ id: LoggerLevel.Debug, label: 'Debug' },
+				{ id: LoggerLevel.Console, label: 'Console' },
+			],
+			allowCustom: false,
+			width: 8,
+		},
+		{
+			type: 'static-text',
+			id: 'rfc-link1',
+			label: '',
+			value: '<A HREF="https://www.ietf.org/rfc/rfc5424.txt">RFC 5424</A>',
+			width: 4,
+			isVisible: (options) => {
+				return !!options.rfc5424
+			},
+		},
+		{
+			type: 'static-text',
+			id: 'rfc-link2',
+			label: '',
+			value: '<A HREF="https://www.ietf.org/rfc/rfc3164.txt">RFC 3164</A>',
+			width: 4,
+			isVisible: (options) => {
+				return !options.rfc5424
 			},
 		},
 	]
