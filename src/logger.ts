@@ -49,4 +49,39 @@ export class Logger {
 		}
 		return true
 	}
+
+	/**
+	 * Log to Console
+	 */
+	public console(data: string | object | boolean | number): boolean {
+		return this.log(LoggerLevel.Console, data)
+	}
+
+	/**
+	 * Log at debug level
+	 */
+	public debug(data: string | object | boolean | number): boolean {
+		return this.log(LoggerLevel.Debug, data)
+	}
+
+	/**
+	 * Log at info level
+	 */
+	public info(data: string | object | boolean | number): boolean {
+		return this.log(LoggerLevel.Information, data)
+	}
+
+	/**
+	 * Log at warning level
+	 */
+	public warn(data: string | object | boolean | number): boolean {
+		return this.log(LoggerLevel.Warning, data)
+	}
+
+	/**
+	 * Log at error level
+	 */
+	public error(data: string | object | boolean | number): boolean {
+		return this.log(LoggerLevel.Error, data)
+	}
 }

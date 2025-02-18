@@ -4,7 +4,7 @@ import { UpdateVariableDefinitions } from './variables.js'
 import { UpgradeScripts } from './upgrades.js'
 import { UpdateActions } from './actions.js'
 import { UpdateFeedbacks } from './feedbacks.js'
-import { Logger, LoggerLevel } from './logger.js'
+import { Logger } from './logger.js'
 import { StatusManager } from './status.js'
 import syslog from '@phillipivan/syslog-client'
 import PQueue from 'p-queue'
@@ -30,16 +30,16 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 			await queue.add(() => {
 				this.syslogClient.log(message, options, (error) => {
 					if (error) {
-						this.logger.log(LoggerLevel.Warning, `Message Send Failure:\nMessage: ${message}\n${JSON.stringify(error)}`)
+						this.logger.warn(`Message Send Failure:\nMessage: ${message}\n${JSON.stringify(error)}`)
 						this.#statusManager.updateStatus(InstanceStatus.ConnectionFailure, 'Message Send Failure')
 					} else {
-						this.logger.log(LoggerLevel.Debug, `Message sent: ${message}`)
+						this.logger.debug(`Message sent: ${message}`)
 						this.#statusManager.updateStatus(InstanceStatus.Ok)
 					}
 				})
 			})
 		} else {
-			this.logger.log(LoggerLevel.Warning, `Syslog client not initialised.\nCould not send: ${message}`)
+			this.logger.warn(`Syslog client not initialised.\nCould not send: ${message}`)
 		}
 	}
 
@@ -55,13 +55,16 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 			appName: config.appName,
 			udpBindAddress: '0.0.0.0',
 		}
+		this.logger.debug(
+			`Creating new syslog client\nTarget Host: ${config.host}\nConfig Options: ${JSON.stringify(options)}`,
+		)
 		this.syslogClient = syslog.createClient(config.host, options)
 		this.syslogClient.on('close', () => {
-			this.logger.log(LoggerLevel.Warning, 'Client Closed')
+			this.logger.warn('Client Closed')
 			this.#statusManager.updateStatus(InstanceStatus.Disconnected, 'Client Closed')
 		})
 		this.syslogClient.on('error', (error: Error) => {
-			this.logger.log(LoggerLevel.Error, `${error.name}: ${error.message}\n${error.cause}\n${error.stack}`)
+			this.logger.error(`${error.name}: ${error.message}\n${error.cause}\n${error.stack}`)
 			this.#statusManager.updateStatus(InstanceStatus.UnknownError, error.name)
 		})
 		this.#statusManager.updateStatus(InstanceStatus.Ok)
@@ -72,7 +75,7 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 	}
 	// When module gets deleted
 	async destroy(): Promise<void> {
-		this.logger.log(LoggerLevel.Debug, `destroy ${this.id}:${this.label}`)
+		this.logger.debug(`destroy ${this.id}:${this.label}`)
 		queue.clear()
 		if (this.syslogClient) {
 			this.syslogClient.close()
@@ -90,7 +93,7 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 			this.updateFeedbacks() // export feedbacks
 			this.updateVariableDefinitions() // export variable definitions
 		} else {
-			this.updateStatus(InstanceStatus.BadConfig, 'No Host')
+			this.#statusManager.updateStatus(InstanceStatus.BadConfig, 'No Host')
 		}
 	}
 
