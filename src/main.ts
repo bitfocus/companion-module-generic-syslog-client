@@ -33,7 +33,7 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 						this.logger.warn(`Message Send Failure:\nMessage: ${message}\n${JSON.stringify(error)}`)
 						this.#statusManager.updateStatus(InstanceStatus.ConnectionFailure, 'Message Send Failure')
 					} else {
-						this.logger.debug(`Message sent: ${message}`)
+						this.logger.debug(`Message sent: ${message}\nOptions: ${JSON.stringify(options)}`)
 						this.#statusManager.updateStatus(InstanceStatus.Ok)
 					}
 				})
