@@ -81,6 +81,10 @@ export class StatusManager {
 	 */
 
 	public destroy(): void {
+		if (this.debounceTimer) {
+			clearTimeout(this.debounceTimer)
+			delete this.debounceTimer
+		}
 		this.setNewStatus({ status: InstanceStatus.Disconnected, message: 'Destroyed' })
 	}
 }
