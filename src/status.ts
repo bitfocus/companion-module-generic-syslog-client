@@ -21,6 +21,7 @@ export class StatusManager {
 	#parentInstance!: InstanceBase<ModuleConfig>
 	private debounceTimer: NodeJS.Timeout | undefined
 	#debounceTimeout: number = 1000
+	#isDestroyed: boolean = false
 
 	constructor(
 		self: InstanceBase<ModuleConfig>,
@@ -41,6 +42,10 @@ export class StatusManager {
 		return this.#currentStatus
 	}
 
+	public get isDestroyed(): boolean {
+		return this.#isDestroyed
+	}
+
 	/**
 	 * Updates status if changed after debounce interval
 	 * @param newStatus Status & Message
@@ -48,6 +53,12 @@ export class StatusManager {
 	 */
 
 	public updateStatus(newStatus: InstanceStatus, newMsg: string | object | null = null): void {
+		if (this.#isDestroyed) {
+			console.log(
+				`Module destroyed. Can't update status\n${newStatus}: ${typeof newMsg == 'object' ? JSON.stringify(newMsg) : newMsg}`,
+			)
+			return
+		}
 		if (this.#currentStatus.status === newStatus && this.#currentStatus.message === newMsg) return
 		this.#newStatus = { status: newStatus, message: newMsg }
 		if (this.debounceTimer) {
@@ -86,5 +97,6 @@ export class StatusManager {
 			delete this.debounceTimer
 		}
 		this.setNewStatus({ status: InstanceStatus.Disconnected, message: 'Destroyed' })
+		this.#isDestroyed = true
 	}
 }
