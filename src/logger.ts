@@ -1,4 +1,4 @@
-import { InstanceBase } from '@companion-module/base'
+import { DropdownChoice, InstanceBase } from '@companion-module/base'
 import { type ModuleConfig } from './config.js'
 
 export enum LoggerLevel {
@@ -8,6 +8,14 @@ export enum LoggerLevel {
 	Debug = 3,
 	Console = 4,
 }
+
+export const loggerLevelChoices: DropdownChoice[] = [
+	{ id: LoggerLevel.Error, label: 'Error' },
+	{ id: LoggerLevel.Warning, label: 'Warning' },
+	{ id: LoggerLevel.Information, label: 'Information' },
+	{ id: LoggerLevel.Debug, label: 'Debug' },
+	{ id: LoggerLevel.Console, label: 'Console' },
+]
 
 /**
  * Utility class to manage logging constrained to specified level

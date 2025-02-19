@@ -1,7 +1,7 @@
-import { Regex, type SomeCompanionConfigField } from '@companion-module/base'
+import { Regex, type SomeCompanionConfigField, type DropdownChoice } from '@companion-module/base'
 import os from 'node:os'
 import { Facility, Severity, Transport } from '@phillipivan/syslog-client'
-import { LoggerLevel } from './logger.js'
+import { LoggerLevel, loggerLevelChoices } from './logger.js'
 
 export interface ModuleConfig {
 	host: string
@@ -15,7 +15,7 @@ export interface ModuleConfig {
 	logging: LoggerLevel
 }
 
-export const facilityChoices = [
+export const facilityChoices: DropdownChoice[] = [
 	{ id: Facility.Kernel, label: 'Kernel' },
 	{ id: Facility.User, label: 'User' },
 	{ id: Facility.Mail, label: 'Mail' },
@@ -40,7 +40,7 @@ export const facilityChoices = [
 	{ id: Facility.Local7, label: 'Local 7' },
 ]
 
-export const severityChoices = [
+export const severityChoices: DropdownChoice[] = [
 	{ id: Severity.Emergency, label: 'Emergency' },
 	{ id: Severity.Alert, label: 'Alert' },
 	{ id: Severity.Critical, label: 'Critical' },
@@ -141,13 +141,7 @@ export function GetConfigFields(): SomeCompanionConfigField[] {
 			id: 'logging',
 			label: 'Minimum Log Level',
 			default: LoggerLevel.Information,
-			choices: [
-				{ id: LoggerLevel.Error, label: 'Error' },
-				{ id: LoggerLevel.Warning, label: 'Warning' },
-				{ id: LoggerLevel.Information, label: 'Information' },
-				{ id: LoggerLevel.Debug, label: 'Debug' },
-				{ id: LoggerLevel.Console, label: 'Console' },
-			],
+			choices: loggerLevelChoices,
 			allowCustom: false,
 			width: 8,
 		},
