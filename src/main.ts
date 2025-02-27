@@ -21,10 +21,15 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 		super(internal)
 	}
 
-	async logMessage(msg: string, options: syslog.MessageOptions): Promise<void> {
+	private parseEscapeCharacters(msg: string): string {
+		return msg.replaceAll('\\n', '\n').replaceAll('\\r', '\r').replaceAll('\\t', '\t')
+	}
+
+	async logMessage(msg: string, options: syslog.MessageOptions, escape: boolean): Promise<void> {
 		let message = await this.parseVariablesInString(msg)
+		if (escape) message = this.parseEscapeCharacters(message)
 		while (message.endsWith('\n')) {
-			message = message.substring(0, message.length - 2)
+			message = message.substring(0, message.length - 1)
 		}
 		if (this.syslogClient) {
 			await queue.add(() => {

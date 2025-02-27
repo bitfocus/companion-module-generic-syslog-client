@@ -51,6 +51,13 @@ export function UpdateActions(self: SyslogClient): void {
 					},
 					isVisibleData: { rfc5424: self.config.rfc5424 },
 				},
+				{
+					type: 'checkbox',
+					id: 'escape',
+					label: 'Parse Escape Charaters',
+					default: true,
+					tooltip: 'Parse escape characters such as \\r \\n',
+				},
 			],
 			callback: async (action, context) => {
 				const options: MessageOptions = {
@@ -59,7 +66,7 @@ export function UpdateActions(self: SyslogClient): void {
 					appName: await context.parseVariablesInString(action.options.appName?.toString() ?? ''),
 					msgid: await context.parseVariablesInString(action.options.msgId?.toString() ?? ''),
 				}
-				await self.logMessage(action.options.msg?.toString() ?? '', options)
+				await self.logMessage(action.options.msg?.toString() ?? '', options, action.options.escape as boolean)
 			},
 		},
 	})
