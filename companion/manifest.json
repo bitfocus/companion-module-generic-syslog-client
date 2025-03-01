@@ -5,8 +5,8 @@
 	"description": "Generate Custom Syslog Messages",
 	"version": "0.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/phillipivan/companion-module-generic-syslog-client.git",
-	"bugs": "https://github.com/phillipivan/companion-module-generic-syslog-client/issues",
+	"repository": "git+https://github.com/bitfocus/companion-module-generic-syslog-client.git",
+	"bugs": "https://github.com/bitfocus/companion-module-generic-syslog-client/issues",
 	"maintainers": [
 		{
 			"name": "Phillip Ivan Pietruschka",
