@@ -22,13 +22,20 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 	}
 
 	private parseEscapeCharacters(msg: string): string {
-		return msg.replaceAll('\\n', '\n').replaceAll('\\r', '\r').replaceAll('\\t', '\t')
+		return msg
+			.replaceAll('\\n', '\n')
+			.replaceAll('\\r', '\r')
+			.replaceAll('\\t', '\t')
+			.replaceAll('\\f', '\f')
+			.replaceAll('\\v', '\v')
+			.replaceAll('\\b', '\b')
+			.replaceAll('\\\\', '\\')
 	}
 
 	async logMessage(msg: string, options: syslog.MessageOptions, escape: boolean): Promise<void> {
-		let message = await this.parseVariablesInString(msg)
+		let message = msg
 		if (escape) message = this.parseEscapeCharacters(message)
-		while (message.endsWith('\n')) {
+		while (message.endsWith('\n') || message.endsWith('\r')) {
 			message = message.substring(0, message.length - 1)
 		}
 		if (this.syslogClient) {

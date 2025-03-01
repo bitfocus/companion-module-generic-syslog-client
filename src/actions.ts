@@ -12,7 +12,7 @@ export function UpdateActions(self: SyslogClient): void {
 					type: 'textinput',
 					label: 'Message',
 					default: '',
-					useVariables: true,
+					useVariables: { local: true },
 				},
 				{
 					type: 'dropdown',
@@ -34,7 +34,7 @@ export function UpdateActions(self: SyslogClient): void {
 					label: 'Application Name',
 					default: self.config.appName,
 					tooltip: 'Set the APP-NAME field when using RFC 5424',
-					useVariables: true,
+					useVariables: { local: true },
 					isVisible: (_options, isVisibleData) => {
 						return isVisibleData.rfc5424
 					},
@@ -45,7 +45,7 @@ export function UpdateActions(self: SyslogClient): void {
 					id: 'msgId',
 					label: 'Message ID',
 					default: '',
-					useVariables: true,
+					useVariables: { local: true },
 					isVisible: (_options, isVisibleData) => {
 						return isVisibleData.rfc5424
 					},
@@ -56,7 +56,7 @@ export function UpdateActions(self: SyslogClient): void {
 					id: 'escape',
 					label: 'Parse Escape Charaters',
 					default: true,
-					tooltip: 'Parse escape characters such as \\r \\n',
+					tooltip: 'Parse escape characters such as \\r, \\n, \\t',
 				},
 			],
 			callback: async (action, context) => {
@@ -66,7 +66,11 @@ export function UpdateActions(self: SyslogClient): void {
 					appName: await context.parseVariablesInString(action.options.appName?.toString() ?? ''),
 					msgid: await context.parseVariablesInString(action.options.msgId?.toString() ?? ''),
 				}
-				await self.logMessage(action.options.msg?.toString() ?? '', options, action.options.escape as boolean)
+				await self.logMessage(
+					await context.parseVariablesInString(action.options.msg?.toString() ?? ''),
+					options,
+					action.options.escape as boolean,
+				)
 			},
 		},
 	})
