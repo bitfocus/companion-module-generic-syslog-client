@@ -13,6 +13,7 @@ export function UpdateActions(self: SyslogClient): void {
 					label: 'Message',
 					default: '',
 					useVariables: { local: true },
+					multiline: true,
 				},
 				{
 					type: 'dropdown',
@@ -59,18 +60,14 @@ export function UpdateActions(self: SyslogClient): void {
 					tooltip: 'Parse escape characters such as \\r, \\n, \\t',
 				},
 			],
-			callback: async (action, context) => {
+			callback: async (action, _context) => {
 				const options: MessageOptions = {
 					facility: action.options.facility as Facility,
 					severity: action.options.severity as Severity,
-					appName: await context.parseVariablesInString(action.options.appName?.toString() ?? ''),
-					msgid: await context.parseVariablesInString(action.options.msgId?.toString() ?? ''),
+					appName: action.options.appName?.toString() ?? '',
+					msgid: action.options.msgId?.toString() ?? '',
 				}
-				await self.logMessage(
-					await context.parseVariablesInString(action.options.msg?.toString() ?? ''),
-					options,
-					action.options.escape as boolean,
-				)
+				await self.logMessage(action.options.msg?.toString() ?? '', options, action.options.escape as boolean)
 			},
 		},
 	})
