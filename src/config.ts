@@ -3,7 +3,7 @@ import os from 'node:os'
 import { Facility, Severity, Transport } from '@phillipivan/syslog-client'
 import { LoggerLevel, loggerLevelChoices } from './logger.js'
 
-export interface ModuleConfig {
+export type ModuleConfig = {
 	host: string
 	port: number
 	transport: Transport
@@ -15,7 +15,7 @@ export interface ModuleConfig {
 	logging: LoggerLevel
 }
 
-export const facilityChoices: DropdownChoice[] = [
+export const facilityChoices = [
 	{ id: Facility.Kernel, label: 'Kernel' },
 	{ id: Facility.User, label: 'User' },
 	{ id: Facility.Mail, label: 'Mail' },
@@ -38,9 +38,9 @@ export const facilityChoices: DropdownChoice[] = [
 	{ id: Facility.Local5, label: 'Local 5' },
 	{ id: Facility.Local6, label: 'Local 6' },
 	{ id: Facility.Local7, label: 'Local 7' },
-]
+] as const satisfies DropdownChoice[]
 
-export const severityChoices: DropdownChoice[] = [
+export const severityChoices = [
 	{ id: Severity.Emergency, label: 'Emergency' },
 	{ id: Severity.Alert, label: 'Alert' },
 	{ id: Severity.Critical, label: 'Critical' },
@@ -49,7 +49,7 @@ export const severityChoices: DropdownChoice[] = [
 	{ id: Severity.Notice, label: 'Notice' },
 	{ id: Severity.Informational, label: 'Informational' },
 	{ id: Severity.Debug, label: 'Debug' },
-]
+] as const satisfies DropdownChoice[]
 
 export function GetConfigFields(): SomeCompanionConfigField[] {
 	return [
@@ -122,9 +122,7 @@ export function GetConfigFields(): SomeCompanionConfigField[] {
 			default: 'Companion',
 			width: 4,
 			tooltip: 'Set the APP-NAME field when using RFC 5424',
-			isVisible: (options) => {
-				return !!options.rfc5424
-			},
+			isVisibleExpression: '!!$(options:rfc5424)',
 		},
 		{
 			type: 'static-text',
@@ -132,9 +130,7 @@ export function GetConfigFields(): SomeCompanionConfigField[] {
 			label: '',
 			value: '',
 			width: 4,
-			isVisible: (options) => {
-				return !options.rfc5424
-			},
+			isVisibleExpression: '!$(options:rfc5424)',
 		},
 		{
 			type: 'dropdown',
@@ -151,9 +147,7 @@ export function GetConfigFields(): SomeCompanionConfigField[] {
 			label: '',
 			value: '<A HREF="https://www.ietf.org/rfc/rfc5424.txt">RFC 5424</A>',
 			width: 4,
-			isVisible: (options) => {
-				return !!options.rfc5424
-			},
+			isVisibleExpression: '!!$(options:rfc5424)',
 		},
 		{
 			type: 'static-text',
@@ -161,9 +155,7 @@ export function GetConfigFields(): SomeCompanionConfigField[] {
 			label: '',
 			value: '<A HREF="https://www.ietf.org/rfc/rfc3164.txt">RFC 3164</A>',
 			width: 4,
-			isVisible: (options) => {
-				return !options.rfc5424
-			},
+			isVisibleExpression: '!$(options:rfc5424)',
 		},
 	]
 }

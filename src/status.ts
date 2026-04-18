@@ -1,5 +1,5 @@
 import { InstanceBase, InstanceStatus } from '@companion-module/base'
-import type { ModuleConfig } from './config.js'
+import type { ModuleTypes } from './types.js'
 
 export interface Status {
 	status: InstanceStatus
@@ -18,13 +18,13 @@ export interface Status {
 export class StatusManager {
 	#currentStatus: Status = { status: InstanceStatus.Disconnected, message: '' }
 	#newStatus: Status = { status: InstanceStatus.Disconnected, message: '' }
-	#parentInstance!: InstanceBase<ModuleConfig>
+	#parentInstance!: InstanceBase<ModuleTypes>
 	private debounceTimer: NodeJS.Timeout | undefined
 	#debounceTimeout: number = 1000
 	#isDestroyed: boolean = false
 
 	constructor(
-		self: InstanceBase<ModuleConfig>,
+		self: InstanceBase<ModuleTypes>,
 		initStatus: Status = { status: InstanceStatus.Disconnected, message: null },
 		debounceTimeout: number = 1000,
 	) {

@@ -1,4 +1,4 @@
-import { InstanceBase, runEntrypoint, InstanceStatus, SomeCompanionConfigField } from '@companion-module/base'
+import { InstanceBase, InstanceStatus, SomeCompanionConfigField, parseEscapeCharacters } from '@companion-module/base'
 import { GetConfigFields, type ModuleConfig } from './config.js'
 import { UpdateVariableDefinitions } from './variables.js'
 import { UpgradeScripts } from './upgrades.js'
@@ -6,43 +6,34 @@ import { UpdateActions } from './actions.js'
 import { UpdateFeedbacks } from './feedbacks.js'
 import { Logger } from './logger.js'
 import { StatusManager } from './status.js'
+import type { InstanceBaseExt, ModuleTypes } from './types.js'
 import syslog from '@phillipivan/syslog-client'
 import PQueue from 'p-queue'
 
-const queue = new PQueue({ concurrency: 1, interval: 10, intervalCap: 1 })
+export { UpgradeScripts }
 
-export class SyslogClient extends InstanceBase<ModuleConfig> {
+export default class SyslogClient extends InstanceBase<ModuleTypes> implements InstanceBaseExt {
 	config!: ModuleConfig // Setup in init()
+	#queue = new PQueue({ concurrency: 1, interval: 10, intervalCap: 1 })
 	#statusManager = new StatusManager(this, { status: InstanceStatus.Connecting, message: 'Initialising' }, 2000)
-	public logger: Logger = new Logger(this)
-	private syslogClient!: syslog.Client
+	public logger: Logger = new Logger(this.label)
+	#syslogClient!: syslog.Client
 
 	constructor(internal: unknown) {
 		super(internal)
 	}
 
-	private parseEscapeCharacters(msg: string): string {
-		return msg
-			.replaceAll('\\n', '\n')
-			.replaceAll('\\r', '\r')
-			.replaceAll('\\t', '\t')
-			.replaceAll('\\f', '\f')
-			.replaceAll('\\v', '\v')
-			.replaceAll('\\b', '\b')
-			.replaceAll('\\\\', '\\')
-	}
-
 	async logMessage(msg: string, options: syslog.MessageOptions, escape: boolean): Promise<void> {
 		let message = msg
-		if (escape) message = this.parseEscapeCharacters(message)
+		if (escape) message = parseEscapeCharacters(message)
 		while (message.endsWith('\n') || message.endsWith('\r')) {
 			message = message.substring(0, message.length - 1)
 		}
-		if (this.syslogClient) {
-			await queue.add(() => {
-				this.syslogClient.log(message, options, (error) => {
+		if (this.#syslogClient) {
+			await this.#queue.add(() => {
+				this.#syslogClient.log(message, options, (error) => {
 					if (error) {
-						this.logger.warn(`Message Send Failure:\nMessage: ${message}\n${JSON.stringify(error)}`)
+						this.logger.warn(`Message Send Failure:\nMessage: ${message}\n${error.message}`)
 						this.#statusManager.updateStatus(InstanceStatus.ConnectionFailure, 'Message Send Failure')
 					} else {
 						this.logger.debug(`Message sent: ${message}\nOptions: ${JSON.stringify(options)}`)
@@ -56,7 +47,7 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 	}
 
 	setupSyslogClient(config: ModuleConfig): void {
-		if (this.syslogClient) this.syslogClient.close()
+		if (this.#syslogClient) this.#syslogClient.close()
 		const options: syslog.ClientOptions = {
 			port: config.port,
 			syslogHostname: config.hostname,
@@ -70,12 +61,12 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 		this.logger.debug(
 			`Creating new syslog client\nTarget Host: ${config.host}\nConfig Options: ${JSON.stringify(options)}`,
 		)
-		this.syslogClient = syslog.createClient(config.host, options)
-		this.syslogClient.on('close', () => {
+		this.#syslogClient = syslog.createClient(config.host, options)
+		this.#syslogClient.on('close', () => {
 			this.logger.warn('Client Closed')
 			this.#statusManager.updateStatus(InstanceStatus.Disconnected, 'Client Closed')
 		})
-		this.syslogClient.on('error', (error: Error) => {
+		this.#syslogClient.on('error', (error: Error) => {
 			this.logger.error(`${error.name}: ${error.message}\n${error.cause}\n${error.stack}`)
 			this.#statusManager.updateStatus(InstanceStatus.UnknownError, error.name)
 		})
@@ -88,17 +79,20 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 	// When module gets deleted
 	async destroy(): Promise<void> {
 		this.logger.debug(`destroy ${this.id}:${this.label}`)
-		queue.clear()
-		if (this.syslogClient) {
-			this.syslogClient.close()
+		this.#queue.clear()
+		await this.#queue.onIdle()
+		if (this.#syslogClient) {
+			this.#syslogClient.close()
 		}
 		this.#statusManager.destroy()
 	}
 
 	async configUpdated(config: ModuleConfig): Promise<void> {
-		queue.clear()
+		this.#queue.clear()
+		await this.#queue.onIdle()
+
 		this.config = config
-		this.logger = new Logger(this, config.logging)
+		this.logger = new Logger(this.label, config.logging)
 		if (this.config.host) {
 			this.setupSyslogClient(config)
 			this.updateActions() // export actions
@@ -126,5 +120,3 @@ export class SyslogClient extends InstanceBase<ModuleConfig> {
 		UpdateVariableDefinitions(this)
 	}
 }
-
-runEntrypoint(SyslogClient, UpgradeScripts)

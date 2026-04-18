@@ -1,5 +1,4 @@
-import { DropdownChoice, InstanceBase } from '@companion-module/base'
-import { type ModuleConfig } from './config.js'
+import { DropdownChoice, createModuleLogger, type ModuleLogger } from '@companion-module/base'
 
 export enum LoggerLevel {
 	Error = 0,
@@ -19,18 +18,18 @@ export const loggerLevelChoices: DropdownChoice[] = [
 
 /**
  * Utility class to manage logging constrained to specified level
- * @param self Module instance
+ * @param label Module logger label
  * @param logLevel Minimum Log Level to action, others are discarded
  *
  */
 
 export class Logger {
-	private _self!: InstanceBase<ModuleConfig>
 	#minLogLevel: LoggerLevel = LoggerLevel.Console
+	#logger!: ModuleLogger
 
-	constructor(self: InstanceBase<ModuleConfig>, logLevel: LoggerLevel = LoggerLevel.Information) {
-		this._self = self
+	constructor(label: string, logLevel: LoggerLevel = LoggerLevel.Information) {
 		this.#minLogLevel = logLevel
+		this.#logger = createModuleLogger(label || 'Syslog')
 	}
 
 	/**
@@ -53,7 +52,7 @@ export class Logger {
 						: level === LoggerLevel.Information
 							? 'info'
 							: 'debug'
-			this._self.log(logLevel, logData)
+			this.#logger[logLevel](logData)
 		}
 		return true
 	}

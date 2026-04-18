@@ -1,5 +1,7 @@
 {
+	"$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
 	"id": "generic-syslog-client",
+	"type": "connection",
 	"name": "generic-syslog-client",
 	"shortname": "Syslog Client",
 	"description": "Generate Custom Syslog Messages",
